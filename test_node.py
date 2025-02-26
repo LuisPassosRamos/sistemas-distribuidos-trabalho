@@ -3,8 +3,6 @@ import xmlrpc.client
 import pytest
 from unittest.mock import MagicMock, patch
 
-# Supondo que o código principal esteja no arquivo "distributed.py"
-# Ajuste o nome do módulo conforme necessário.
 from distributed import Node
 
 # --------------------------
