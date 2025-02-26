@@ -292,7 +292,7 @@ def client_simulation(nodes_info, monitor_port):
     try:
         # Para eleição natural, simulamos que o node 3 falha naturalmente
         print("Simulando falha natural: node 3 cai...")
-        # Alteramos o proxy do node 3 para um endereço inválido (simula queda)
+        # Simulando queda trocando pra um endereço inválido
         proxies[3] = xmlrpc.client.ServerProxy("http://localhost:9999")
         result = proxies[1].start_election()
         print("Resultado eleição:", result)
