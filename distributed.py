@@ -70,17 +70,19 @@ class Node:
     def send_message(self, target_node_id, message):
         self.lamport_clock += 1
         timestamp = self.lamport_clock
-        print(f"Lamport: node {self.node_id} envinando p/ node {target_node_id} (Clk {timestamp}): {message}")
+        print(f"Lamport: Nód {self.node_id} envinando p/ Nód {target_node_id} (Clk {timestamp}): {message}")
         target_info = self.peers.get(target_node_id)
         if not target_info:
-            print(f"Lamport: node {self.node_id}: node {target_node_id} não achado!")
+            print(f"Lamport: Nód {self.node_id}: Nód {target_node_id} não achado!")
             return
         url = f"http://{target_info[0]}:{target_info[1]}"
         try:
             proxy = xmlrpc.client.ServerProxy(url)
-            proxy.receive_message(timestamp, message, self.node_id)
+            new_clock = proxy.receive_message(timestamp, message, self.node_id)
+            # Atualiza o clock do nó remetente como max(clock atual, novo clock) + 1
+            self.lamport_clock = max(self.lamport_clock, new_clock) + 1
         except Exception as e:
-            print(f"Lamport: node {self.node_id}: Erro ao enviar p/ node {target_node_id}: {e}")
+            print(f"Lamport: Nód {self.node_id}: Erro ao enviar p/ Nód {target_node_id}: {e}")
 
     def receive_message(self, timestamp, message, sender_node_id):
         self.lamport_clock = max(self.lamport_clock, timestamp) + 1
