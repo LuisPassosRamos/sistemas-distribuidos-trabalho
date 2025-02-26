@@ -111,7 +111,7 @@ def test_receive_election_calls_start_election(monkeypatch):
 # --------------------------
 def test_heartbeat_loop(monkeypatch):
     called = 0
-    def fake_send_heartbeat(self):
+    def fake_send_heartbeat():
         nonlocal called
         called += 1
     # Aplica o fake no método send_heartbeat da classe Node antes de criar uma instância

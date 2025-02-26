@@ -70,10 +70,10 @@ class Node:
     def send_message(self, target_node_id, message):
         self.lamport_clock += 1
         timestamp = self.lamport_clock
-        print(f"Lamport: Nód {self.node_id} envinando p/ Nód {target_node_id} (Clk {timestamp}): {message}")
+        print(f"Lamport: node {self.node_id} envinando p/ node {target_node_id} (Clk {timestamp}): {message}")
         target_info = self.peers.get(target_node_id)
         if not target_info:
-            print(f"Lamport: Nód {self.node_id}: Nód {target_node_id} não achado!")
+            print(f"Lamport: node {self.node_id}: node {target_node_id} não achado!")
             return
         url = f"http://{target_info[0]}:{target_info[1]}"
         try:
@@ -82,7 +82,7 @@ class Node:
             # Atualiza o clock do nó remetente como max(clock atual, novo clock) + 1
             self.lamport_clock = max(self.lamport_clock, new_clock) + 1
         except Exception as e:
-            print(f"Lamport: Nód {self.node_id}: Erro ao enviar p/ Nód {target_node_id}: {e}")
+            print(f"Lamport: node {self.node_id}: Erro ao enviar p/ node {target_node_id}: {e}")
 
     def receive_message(self, timestamp, message, sender_node_id):
         self.lamport_clock = max(self.lamport_clock, timestamp) + 1
@@ -96,14 +96,14 @@ class Node:
         if not self.snapshot_initiated:
             self.snapshot_initiated = True
             self.snapshot_state = self.value
-            print(f"Snapshhot: node {self.node_id} inicia snap. Estado: {self.snapshot_state}")
+            print(f"Snapshot: node {self.node_id} inicia snap. Estado: {self.snapshot_state}")
             for peer_id, info in self.peers.items():
                 url = f"http://{info[0]}:{info[1]}"
                 try:
                     proxy = xmlrpc.client.ServerProxy(url)
                     proxy.receive_marker(self.node_id)
                 except Exception as e:
-                    print(f"Snapshhot: node {self.node_id}: Erro ao enviar marcador p/ node {peer_id}: {e}")
+                    print(f"Snapshot: node {self.node_id}: Erro ao enviar marcador p/ node {peer_id}: {e}")
             return "Snap iniciado"
         else:
             return "Snap já iniciado"
@@ -112,7 +112,7 @@ class Node:
         if not self.snapshot_initiated:
             self.snapshot_initiated = True
             self.snapshot_state = self.value
-            print(f"Snapshhot: node {self.node_id} recebeu 1º marcador do node {sender_node_id}. Estado: {self.snapshot_state}")
+            print(f"Snapshot: node {self.node_id} recebeu 1º marcador do node {sender_node_id}. Estado: {self.snapshot_state}")
             for peer_id, info in self.peers.items():
                 if peer_id == sender_node_id:
                     continue
@@ -121,11 +121,11 @@ class Node:
                     proxy = xmlrpc.client.ServerProxy(url)
                     proxy.receive_marker(self.node_id)
                 except Exception as e:
-                    print(f"Snapshhot: node {self.node_id}: Erro ao enviar marcador p/ node {peer_id}: {e}")
+                    print(f"Snapshot: node {self.node_id}: Erro ao enviar marcador p/ node {peer_id}: {e}")
         self.markers_received[sender_node_id] = True
-        print(f"Snapshhot: node {self.node_id} marca canal do node {sender_node_id} com marcador.")
+        print(f"Snapshot: node {self.node_id} marca canal do node {sender_node_id} com marcador.")
         if all(self.markers_received.values()):
-            print(f"Snapshhot: node {self.node_id} snap completo. Estado: {self.snapshot_state}, Canais: {self.channel_state}")
+            print(f"Snapshot: node {self.node_id} snap completo. Estado: {self.snapshot_state}, Canais: {self.channel_state}")
         return self.snapshot_state
 
     def get_snapshot(self):
